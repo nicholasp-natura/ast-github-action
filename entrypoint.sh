@@ -2,8 +2,27 @@
 
 output_file=./output.log
 
+SCAN_TYPES="${INPUT_SCAN_TYPES}"
+CONTAINER_IMAGES="${INPUT_CONTAINER_IMAGES}"
+
+additional_args=()
+if [ -n "${SCAN_TYPES}" ]; then
+  additional_args+=("--scan-types" "${SCAN_TYPES}")
+fi
+if [ -n "${CONTAINER_IMAGES}" ]; then
+  additional_args+=("--container-images" "${CONTAINER_IMAGES}")
+fi
+
 eval "arr=(${ADDITIONAL_PARAMS})"
-/app/bin/cx scan create --project-name "${PROJECT_NAME}" -s "${SOURCE_DIR}" --branch "${BRANCH#refs/heads/}" --scan-info-format json --agent "Github Action" "${arr[@]}" | tee -i $output_file
+
+/app/bin/cx scan create \
+  --project-name "${PROJECT_NAME}" \
+  -s "${SOURCE_DIR}" \
+  --branch "${BRANCH#refs/heads/}" \
+  "${additional_args[@]}" \
+  --scan-info-format json \
+  --agent "Github Action" \
+  "${arr[@]}" | tee -i $output_file  
 exitCode=${PIPESTATUS[0]}
 
 scanId=(`grep -E '"(ID)":"((\\"|[^"])*)"' $output_file | cut -d',' -f1 | cut -d':' -f2 | tr -d '"'`)

@@ -30,6 +30,12 @@ inputs:
     required: false
     default: ''
     description: 'Additional parameters for AST scan'
+  scan_types:
+    description: 'Tipos de scan (ex: container-security, sast e etc)'
+    required: false
+  container_images:
+    description: 'Nome da imagem (ex: "image-name:latest")'
+    required: false
   repo_name:
     required: false
     default:  ${{ github.event.repository.name }}
